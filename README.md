@@ -1,2 +1,0 @@
-# fingerprint-serial-component
- 
