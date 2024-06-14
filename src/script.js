@@ -4,7 +4,11 @@ if ("serial" in navigator) isSupportSerial.textContent = "Supported";
 else isSupportSerial.textContent = "Not Supported";
 
 async function connectSerial() {
-  const port = await navigator.serial.requestPort();
+  try {
+    const port = await navigator.serial.requestPort();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 const fingerprintSerialBtn = document.getElementById("fingerprint-serial");
