@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Web Serial API Example</title>
   </head>
   <body>
-    <p id="is-support-serial"></p>
-    <br />
-    <button id="fingerprint-serial">Connect Fingerprint</button>
+    <button id="connect">Connect</button>
+    <input type="text" id="inputData" placeholder="Enter delay in seconds" />
+    <button id="sendData">Send</button>
+    <div id="status"></div>
+
+    <script src="src/script.js"></script>
   </body>
-  <script src="src/script.js"></script>
 </html>

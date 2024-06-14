@@ -1,15 +1,38 @@
-const isSupportSerial = document.getElementById("is-support-serial");
+let port;
+let writer;
+let reader;
 
-if ("serial" in navigator) isSupportSerial.textContent = "Supported";
-else isSupportSerial.textContent = "Not Supported";
-
-async function connectSerial() {
+document.getElementById("connect").addEventListener("click", async () => {
   try {
-    const port = await navigator.serial.requestPort();
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+
+    writer = port.writable.getWriter();
+    reader = port.readable.getReader();
+
+    document.getElementById("status").textContent = "Connected to serial port!";
+    readFromSerial();
   } catch (error) {
-    console.log(error);
+    document.getElementById("status").textContent = `Error: ${error}`;
+  }
+});
+
+document.getElementById("sendData").addEventListener("click", async () => {
+  const inputData = document.getElementById("inputData").value;
+  const data = new TextEncoder().encode(inputData + "\n");
+  await writer.write(data);
+  document.getElementById("status").textContent = `Sent: ${inputData}`;
+});
+
+async function readFromSerial() {
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      reader.releaseLock();
+      break;
+    }
+
+    const receivedText = new TextDecoder().decode(value);
+    document.getElementById("status").textContent = `Received: ${receivedText}`;
   }
 }
-
-const fingerprintSerialBtn = document.getElementById("fingerprint-serial");
-fingerprintSerialBtn.addEventListener("click", connectSerial);
