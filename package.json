@@ -1,5 +1,9 @@
 {
+  "scripts": {
+    "start": "npx tsc && sleep 2 && node liveServer.js"
+  },
   "devDependencies": {
+    "live-server": "^1.2.2",
     "typescript": "^5.4.5"
   }
 }
