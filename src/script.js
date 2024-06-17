@@ -8,7 +8,7 @@ const Commands = {
 document.getElementById("connect").addEventListener("click", async () => {
   try {
     port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
+    await port.open({ baudRate: 57600 });
     document.getElementById("status").textContent = "Connected to serial port!";
   } catch (error) {
     document.getElementById("status").textContent = `Error: ${error}`;
