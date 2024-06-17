@@ -15,14 +15,6 @@ document.getElementById("connect").addEventListener("click", async () => {
   }
 });
 
-// document.getElementById("sendData").addEventListener("click", async () => {
-//   try {
-//     await sendData(Commands.GET_RANDOM_CODE);
-//   } catch (error) {
-//     document.getElementById("status").textContent = `Error: ${error}`;
-//   }
-// });
-
 document.getElementById("write").addEventListener("click", async () => {
   try {
     await writeToSerial(Commands.GET_RANDOM_CODE);
@@ -57,8 +49,3 @@ async function readFromSerial() {
     console.error(error);
   }
 }
-
-// async function sendData(command) {
-//   await writeToSerial(command);
-//   await readFromSerial();
-// }
