@@ -15,9 +15,25 @@ document.getElementById("connect").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("sendData").addEventListener("click", async () => {
+// document.getElementById("sendData").addEventListener("click", async () => {
+//   try {
+//     await sendData(Commands.GET_RANDOM_CODE);
+//   } catch (error) {
+//     document.getElementById("status").textContent = `Error: ${error}`;
+//   }
+// });
+
+document.getElementById("write").addEventListener("click", async () => {
   try {
-    await sendData(Commands.GET_RANDOM_CODE);
+    await writeToSerial(Commands.GET_RANDOM_CODE);
+  } catch (error) {
+    document.getElementById("status").textContent = `Error: ${error}`;
+  }
+});
+
+document.getElementById("read").addEventListener("click", async () => {
+  try {
+    await readFromSerial();
   } catch (error) {
     document.getElementById("status").textContent = `Error: ${error}`;
   }
@@ -42,7 +58,7 @@ async function readFromSerial() {
   }
 }
 
-async function sendData(command) {
-  await writeToSerial(command);
-  await readFromSerial();
-}
+// async function sendData(command) {
+//   await writeToSerial(command);
+//   await readFromSerial();
+// }
