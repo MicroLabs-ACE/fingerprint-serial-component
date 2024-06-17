@@ -5,7 +5,9 @@ void setup() {
 void loop() {
   while (Serial.available() > 0) {
     byte inputData = Serial.read();
-    byte outputData = inputData + 1;
-    Serial.write(outputData);
+    for (int i = 1; i <= 5; i++) {
+      byte outputData = inputData + i;
+      Serial.write(outputData);
+    }
   }
 }

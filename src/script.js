@@ -1,4 +1,9 @@
 let port;
+const Commands = {
+  GET_RANDOM_CODE: [
+    0xef, 0x01, 0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x03, 0x14, 0x00, 0x18,
+  ],
+};
 
 document.getElementById("connect").addEventListener("click", async () => {
   try {
@@ -12,27 +17,32 @@ document.getElementById("connect").addEventListener("click", async () => {
 
 document.getElementById("sendData").addEventListener("click", async () => {
   try {
-    await sendData();
+    await sendData(Commands.GET_RANDOM_CODE);
   } catch (error) {
     document.getElementById("status").textContent = `Error: ${error}`;
   }
 });
 
-async function sendData() {
+async function writeToSerial(command) {
   const writer = port.writable.getWriter();
-  const data = new Uint8Array([100]);
+  const data = new Uint8Array(command);
   await writer.write(data);
+  console.log(`Sent: ${data}`);
+  writer.releaseLock();
+}
 
-  while (port.readable) {
-    const reader = port.readable.getReader();
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        if (value) console.log(value);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+async function readFromSerial() {
+  const reader = port.readable.getReader();
+  try {
+    const { value, done } = await reader.read();
+    reader.releaseLock();
+    if (value) console.log(`Received: ${value}`);
+  } catch (error) {
+    console.error(error);
   }
+}
+
+async function sendData(command) {
+  await writeToSerial(command);
+  await readFromSerial();
 }
