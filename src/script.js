@@ -1,9 +1,6 @@
+import { Commands } from "./commands";
+
 let port;
-const Commands = {
-  GET_RANDOM_CODE: [
-    0xef, 0x01, 0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x03, 0x14, 0x00, 0x18,
-  ],
-};
 
 document.getElementById("connect").addEventListener("click", async () => {
   try {
