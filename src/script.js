@@ -1,6 +1,8 @@
-import { Commands } from "./commands";
+import { Commands } from "./commands.js";
 
 let port;
+
+// Document
 
 document.getElementById("connect").addEventListener("click", async () => {
   try {
@@ -10,6 +12,11 @@ document.getElementById("connect").addEventListener("click", async () => {
   } catch (error) {
     document.getElementById("status").textContent = `Error: ${error}`;
   }
+});
+
+document.getElementById("checksum").addEventListener("click", async () => {
+  const checksum = await computeChecksum(Commands.GET_RANDOM_CODE);
+  console.log(checksum);
 });
 
 document.getElementById("write").addEventListener("click", async () => {
@@ -28,9 +35,23 @@ document.getElementById("read").addEventListener("click", async () => {
   }
 });
 
+// Functions
+
+
+async function computeChecksum(byteArray) {
+  let sum = 0;
+  for (let i = 0; i < byteArray.length; i++) {
+    sum += byteArray[i];
+  }
+
+  return sum % 63;
+}
+
 async function writeToSerial(command) {
   const writer = port.writable.getWriter();
-  const data = new Uint8Array(command);
+  const checkSum = computeFletcherChecksum(command);
+  const commandAndChecksum = [...command, checkSum];
+  const data = new Uint8Array(commandAndChecksum);
   await writer.write(data);
   console.log(`Sent: ${data}`);
   writer.releaseLock();
