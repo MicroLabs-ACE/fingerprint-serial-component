@@ -18,33 +18,35 @@ document.getElementById("connect").addEventListener("click", async () => {
 });
 
 document
+  .getElementById("generateRandomCode")
+  .addEventListener("click", async () => {
+    await generateRandomCode();
+  });
+
+document.getElementById("writeGRC").addEventListener("click", async () => {
+  await writeGRC();
+});
+
+document.getElementById("readGRC").addEventListener("click", async () => {
+  await readGRC();
+});
+
+document
   .getElementById("captureFingerprint")
   .addEventListener("click", async () => {
-    try {
-      await captureFingerprint();
-    } catch (error) {
-      document.getElementById("status").textContent = `Error: ${error}`;
-    }
+    await captureFingerprint();
   });
 
 document
   .getElementById("generateCharacterFile")
   .addEventListener("click", async () => {
-    try {
-      await generateCharacterFile();
-    } catch (error) {
-      document.getElementById("status").textContent = `Error: ${error}`;
-    }
+    await generateCharacterFile();
   });
 
 document
   .getElementById("verifyFingerprint")
   .addEventListener("click", async () => {
-    try {
-      await verifyFingerprint();
-    } catch (error) {
-      document.getElementById("status").textContent = `Error: ${error}`;
-    }
+    await verifyFingerprint();
   });
 
 // Functions
@@ -68,48 +70,57 @@ async function writeToSerial(command) {
 async function readFromSerial() {
   const reader = port.readable.getReader();
   try {
-    const { value, done } = await reader.read();
-    reader.releaseLock();
-    if (value) console.log(`Received: ${value}`);
-
-    return value;
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        reader.releaseLock();
+        console.log(`Received: ${value}`);
+        return value;
+      }
+    }
   } catch (error) {
     console.error(error);
   }
 }
 
-async function captureFingerprint() {
-  while (true) {
-    await writeToSerial(Commands.GEN_IMG);
-    await new Promise((resolve) => {
-      setTimeout(resolve, CAPTURE_FINGERPRINT_DELAY);
-    });
-    const result = await readFromSerial();
+async function writeGRC() {
+  await writeToSerial(Commands.GET_RANDOM_CODE);
+}
 
-    const confirmationCode = result.slice(9, 10);
-    switch (confirmationCode) {
-      case 0: // fingerprint collection success
-        console.log("Capture fingerprint.");
-        return true;
-      case 2: // can't detect finger
-        console.log("No fingerprint detected");
-        return false;
-      case 1: // error receiving package
-        console.log("Error when receiving package.");
-        return false;
-      case 3: // failed to collect finger
-      default:
-        console.log("Error when capturing fingerprint.");
-        return false;
-    }
+async function readGRC() {
+  await readFromSerial();
+}
+
+async function generateRandomCode() {
+  await writeToSerial(Commands.GET_RANDOM_CODE);
+  const result = await readFromSerial();
+  console.log(result);
+}
+
+async function captureFingerprint() {
+  await writeToSerial(Commands.GEN_IMG);
+  const result = await readFromSerial();
+
+  const confirmationCode = result.slice(9, 10);
+  switch (confirmationCode) {
+    case 0: // fingerprint collection success
+      console.log("Captured fingerprint.");
+      return true;
+    case 2: // can't detect finger
+      console.log("No fingerprint detected.");
+      return false;
+    case 1: // error receiving package
+      console.log("Error when receiving package.");
+      return false;
+    case 3: // failed to collect finger
+    default:
+      console.log("Error when capturing fingerprint.");
+      return false;
   }
 }
 
 async function generateCharacterFile() {
   await writeToSerial(Commands.GEN_CHAR);
-  await new Promise((resolve) => {
-    setTimeout(resolve, GENERATE_CHARACTER_FILE_DELAY);
-  });
   const result = await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
@@ -129,9 +140,6 @@ async function generateCharacterFile() {
 
 async function searchFingerprint() {
   await writeToSerial(Commands.SEARCH);
-  await new Promise((resolve) => {
-    setTimeout(resolve, SEARCH_FINGERPRINT_DELAY);
-  });
   const result = await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
