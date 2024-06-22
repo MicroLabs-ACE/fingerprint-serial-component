@@ -2,10 +2,6 @@ import { Commands } from "./commands.js";
 
 let port;
 
-const CAPTURE_FINGERPRINT_DELAY = 10000;
-const GENERATE_CHARACTER_FILE_DELAY = 10000;
-const SEARCH_FINGERPRINT_DELAY = 10000;
-
 // Document
 document.getElementById("connect").addEventListener("click", async () => {
   try {
