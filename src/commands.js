@@ -8,12 +8,13 @@ const HEADER_AND_ADDR = [
 ];
 
 export const Commands = {
-  GET_RANDOM_CODE: [
+  GEN_CHAR: [
     ...HEADER_AND_ADDR,
     0x01, // Package Identifier
     0x00, // Package Length
     0x03, // Package Length
-    0x14, // Instruction Code
+    0x02, // Instruction Code
+    0x01, // BufferID
   ],
 
   GEN_IMG: [
@@ -24,13 +25,12 @@ export const Commands = {
     0x01, // Instruction Code
   ],
 
-  GEN_CHAR: [
+  GET_RANDOM_CODE: [
     ...HEADER_AND_ADDR,
     0x01, // Package Identifier
     0x00, // Package Length
     0x03, // Package Length
-    0x02, // Instruction Code
-    0x01, // BufferID
+    0x14, // Instruction Code
   ],
 
   SEARCH: [
