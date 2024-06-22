@@ -1,6 +1,6 @@
 var liveServer = require("live-server");
 var params = {
-  file: "index.html",
+  file: "usb.html",
   wait: 500,
 };
 

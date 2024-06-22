@@ -3,7 +3,6 @@ import { Commands } from "./commands.js";
 let port;
 
 // Document
-
 document.getElementById("connect").addEventListener("click", async () => {
   try {
     port = await navigator.serial.requestPort();
@@ -14,10 +13,15 @@ document.getElementById("connect").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("checksum").addEventListener("click", async () => {
-  const checksum = await computeChecksum(Commands.GET_RANDOM_CODE);
-  console.log(checksum);
-});
+document
+  .getElementById("captureFingerprint")
+  .addEventListener("click", async () => {
+    try {
+      await captureFingerprint();
+    } catch (error) {
+      document.getElementById("status").textContent = `Error: ${error}`;
+    }
+  });
 
 document.getElementById("write").addEventListener("click", async () => {
   try {
@@ -36,22 +40,22 @@ document.getElementById("read").addEventListener("click", async () => {
 });
 
 // Functions
-
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function computeChecksum(byteArray) {
   let sum = 0;
-  for (let i = 0; i < byteArray.length; i++) {
-    sum += byteArray[i];
-  }
-
+  for (let i = 0; i < byteArray.length; i++) sum += byteArray[i];
   return sum % 63;
 }
 
 async function writeToSerial(command) {
-  const writer = port.writable.getWriter();
-  const checkSum = computeFletcherChecksum(command);
+  const checkSum = await computeChecksum(command);
   const commandAndChecksum = [...command, checkSum];
   const data = new Uint8Array(commandAndChecksum);
+
+  const writer = port.writable.getWriter();
   await writer.write(data);
   console.log(`Sent: ${data}`);
   writer.releaseLock();
@@ -63,7 +67,15 @@ async function readFromSerial() {
     const { value, done } = await reader.read();
     reader.releaseLock();
     if (value) console.log(`Received: ${value}`);
+
+    return value;
   } catch (error) {
     console.error(error);
   }
+}
+
+async function captureFingerprint() {
+  await writeToSerial(Commands.GET_RANDOM_CODE);
+  await delay(3000);
+  await readFromSerial();
 }
