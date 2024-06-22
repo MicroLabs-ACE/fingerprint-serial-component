@@ -1,6 +1,7 @@
 import { Commands } from "./commands.js";
 
 let port;
+let result;
 
 // Document
 document.getElementById("connect").addEventListener("click", async () => {
@@ -66,13 +67,11 @@ async function writeToSerial(command) {
 async function readFromSerial() {
   const reader = port.readable.getReader();
   try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        reader.releaseLock();
-        console.log(`Received: ${value}`);
-        return value;
-      }
+    const { value, done } = await reader.read();
+    reader.releaseLock();
+    if (value) {
+      console.log(`Received: ${value}`);
+      result = value;
     }
   } catch (error) {
     console.error(error);
@@ -89,35 +88,36 @@ async function readGRC() {
 
 async function generateRandomCode() {
   await writeToSerial(Commands.GET_RANDOM_CODE);
-  const result = await readFromSerial();
-  console.log(result);
+  await readFromSerial();
 }
 
 async function captureFingerprint() {
   await writeToSerial(Commands.GEN_IMG);
-  const result = await readFromSerial();
+  await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
   switch (confirmationCode) {
     case 0: // fingerprint collection success
       console.log("Captured fingerprint.");
       return true;
-    case 2: // can't detect finger
-      console.log("No fingerprint detected.");
-      return false;
     case 1: // error receiving package
       console.log("Error when receiving package.");
       return false;
+    case 2: // can't detect finger
+      console.log("No fingerprint detected.");
+      return false;
     case 3: // failed to collect finger
-    default:
       console.log("Error when capturing fingerprint.");
+      return false;
+    default:
+      console.log("Unknown error.");
       return false;
   }
 }
 
 async function generateCharacterFile() {
   await writeToSerial(Commands.GEN_CHAR);
-  const result = await readFromSerial();
+  await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
   switch (confirmationCode) {
@@ -136,7 +136,7 @@ async function generateCharacterFile() {
 
 async function searchFingerprint() {
   await writeToSerial(Commands.SEARCH);
-  const result = await readFromSerial();
+  await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
   switch (confirmationCode) {
