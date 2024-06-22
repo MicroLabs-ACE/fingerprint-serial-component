@@ -27,22 +27,6 @@ document
     }
   });
 
-document.getElementById("write").addEventListener("click", async () => {
-  try {
-    await writeToSerial(Commands.GET_RANDOM_CODE);
-  } catch (error) {
-    document.getElementById("status").textContent = `Error: ${error}`;
-  }
-});
-
-document.getElementById("read").addEventListener("click", async () => {
-  try {
-    await readFromSerial();
-  } catch (error) {
-    document.getElementById("status").textContent = `Error: ${error}`;
-  }
-});
-
 // Functions
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
