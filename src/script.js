@@ -95,7 +95,7 @@ async function captureFingerprint() {
         console.log("No fingerprint detected");
         return false;
       case 1: // error receiving package
-        console.log("Error when capturing fingerprint.");
+        console.log("Error when receiving package.");
         return false;
       case 3: // failed to collect finger
       default:
