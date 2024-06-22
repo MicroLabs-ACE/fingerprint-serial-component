@@ -2,9 +2,9 @@ import { Commands } from "./commands.js";
 
 let port;
 
-const CAPTURE_FINGERPRINT_DELAY = 3000;
-const GENERATE_CHARACTER_FILE_DELAY = 3000;
-const FINGERPRINT_SEARCH_DELAY = 3000;
+const CAPTURE_FINGERPRINT_DELAY = 10000;
+const GENERATE_CHARACTER_FILE_DELAY = 10000;
+const FINGERPRINT_SEARCH_DELAY = 10000;
 
 // Document
 document.getElementById("connect").addEventListener("click", async () => {
@@ -16,6 +16,26 @@ document.getElementById("connect").addEventListener("click", async () => {
     document.getElementById("status").textContent = `Error: ${error}`;
   }
 });
+
+document
+  .getElementById("captureFingerprint")
+  .addEventListener("click", async () => {
+    try {
+      await captureFingerprint();
+    } catch (error) {
+      document.getElementById("status").textContent = `Error: ${error}`;
+    }
+  });
+
+document
+  .getElementById("generateCharacterFile")
+  .addEventListener("click", async () => {
+    try {
+      await generateCharacterFile();
+    } catch (error) {
+      document.getElementById("status").textContent = `Error: ${error}`;
+    }
+  });
 
 document
   .getElementById("verifyFingerprint")
@@ -71,11 +91,15 @@ async function captureFingerprint() {
     const confirmationCode = result.slice(9, 10);
     switch (confirmationCode) {
       case 0: // fingerprint collection success
+        console.log("Capture fingerprint.");
         return true;
-      case 1: // error receiving package
       case 2: // can't detect finger
+        console.log("No fingerprint detected");
+        return false;
+      case 1: // error receiving package
       case 3: // failed to collect finger
       default:
+        console.log("Error when capturing fingerprint.");
         return false;
     }
   }
@@ -89,12 +113,14 @@ async function generateCharacterFile() {
   const confirmationCode = result.slice(9, 10);
   switch (confirmationCode) {
     case 0: // generate character file success
+      console.log("Generated character file.");
       return true;
     case 1: // error receiving package
     case 6: // failed to generate character file due to disorderly fingerprint image
     case 7: // failed to generate character file due to lack of character in fingerprint image
     case 21: // failed to generate character file due to invalid primary image
     default:
+      console.log("Error when generating character file.");
       return false;
   }
 }
@@ -119,24 +145,21 @@ async function searchFingerprint() {
 }
 
 async function verifyFingerprint() {
-  for (let c = 0; c < 10; c++) {
-    console.log(`Count: ${c}`);
-    const isCaptureFingerprint = await captureFingerprint();
-    if (isCaptureFingerprint) {
-      const isGenerateCharacterFile = await generateCharacterFile();
-      if (isGenerateCharacterFile) {
-        const searchFingerprintResult = await searchFingerprint();
-        switch (searchFingerprint) {
-          case -2:
-            console.log("Error receiving package.");
-            break;
-          case -1:
-            console.log("Fingerprint not matched.");
-            break;
-          default:
-            console.log(searchFingerprintResult);
-            break;
-        }
+  const isCaptureFingerprint = await captureFingerprint();
+  if (isCaptureFingerprint) {
+    const isGenerateCharacterFile = await generateCharacterFile();
+    if (isGenerateCharacterFile) {
+      const searchFingerprintResult = await searchFingerprint();
+      switch (searchFingerprint) {
+        case -2:
+          console.log("Error receiving package.");
+          break;
+        case -1:
+          console.log("Fingerprint not matched.");
+          break;
+        default:
+          console.log(`ID: ${searchFingerprintResult}`);
+          break;
       }
     }
   }
