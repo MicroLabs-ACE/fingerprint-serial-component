@@ -4,7 +4,7 @@ let port;
 
 const CAPTURE_FINGERPRINT_DELAY = 10000;
 const GENERATE_CHARACTER_FILE_DELAY = 10000;
-const FINGERPRINT_SEARCH_DELAY = 10000;
+const SEARCH_FINGERPRINT_DELAY = 10000;
 
 // Document
 document.getElementById("connect").addEventListener("click", async () => {
@@ -48,10 +48,6 @@ document
   });
 
 // Functions
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 async function computeChecksum(byteArray) {
   let sum = 0;
   for (let i = 0; i < byteArray.length; i++) sum += byteArray[i];
@@ -85,7 +81,9 @@ async function readFromSerial() {
 async function captureFingerprint() {
   while (true) {
     await writeToSerial(Commands.GEN_IMG);
-    await delay(CAPTURE_FINGERPRINT_DELAY);
+    await new Promise((resolve) => {
+      setTimeout(resolve, CAPTURE_FINGERPRINT_DELAY);
+    });
     const result = await readFromSerial();
 
     const confirmationCode = result.slice(9, 10);
@@ -97,6 +95,8 @@ async function captureFingerprint() {
         console.log("No fingerprint detected");
         return false;
       case 1: // error receiving package
+        console.log("Error when capturing fingerprint.");
+        return false;
       case 3: // failed to collect finger
       default:
         console.log("Error when capturing fingerprint.");
@@ -107,7 +107,9 @@ async function captureFingerprint() {
 
 async function generateCharacterFile() {
   await writeToSerial(Commands.GEN_CHAR);
-  await delay(GENERATE_CHARACTER_FILE_DELAY);
+  await new Promise((resolve) => {
+    setTimeout(resolve, GENERATE_CHARACTER_FILE_DELAY);
+  });
   const result = await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
@@ -127,7 +129,9 @@ async function generateCharacterFile() {
 
 async function searchFingerprint() {
   await writeToSerial(Commands.SEARCH);
-  await delay(FINGERPRINT_SEARCH_DELAY);
+  await new Promise((resolve) => {
+    setTimeout(resolve, SEARCH_FINGERPRINT_DELAY);
+  });
   const result = await readFromSerial();
 
   const confirmationCode = result.slice(9, 10);
