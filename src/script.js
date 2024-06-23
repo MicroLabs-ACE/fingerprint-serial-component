@@ -51,12 +51,12 @@ document.getElementById("readGRC").addEventListener("click", async () => {
 async function computeChecksum(byteArray) {
   let sum = 0;
   for (let i = 0; i < byteArray.length; i++) sum += byteArray[i];
-  return sum % 63;
+  return [0x00, sum % 63];
 }
 
 async function writeToSerial(command) {
-  const checkSum = await computeChecksum(command);
-  const commandAndChecksum = [...command, checkSum];
+  const checksum = await computeChecksum(command);
+  const commandAndChecksum = [...command, ...checksum];
   const data = new Uint8Array(commandAndChecksum);
 
   const writer = port.writable.getWriter();
