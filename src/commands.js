@@ -12,7 +12,7 @@ export const Commands = {
     ...HEADER_AND_ADDR,
     0x01, // Package Identifier
     0x00, // Package Length
-    0x03, // Package Length
+    0x04, // Package Length
     0x02, // Instruction Code
     0x01, // BufferID
   ],
@@ -43,6 +43,6 @@ export const Commands = {
     0x00, // Start Page
     0x00, // Start Page
     0x01, // Page Number
-    0x2c, // Page Number
+    0x2b, // Page Number
   ],
 };
