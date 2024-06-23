@@ -1,14 +1,23 @@
 const os = require("os");
+const { Buffer } = require("node:buffer");
+
 const { autoDetect } = require("@serialport/bindings-cpp");
 const { SerialPort } = require("serialport");
 
-const Binding = autoDetect();
-Binding.list().then((devices) => {
-  devices.forEach((device) => {
-    console.log(device);
-  });
-});
+const { Commands } = require("./commands");
+
+// const Binding = autoDetect();
+// Binding.list().then((devices) => {
+//   devices.forEach((device) => {
+//     console.log(device);
+//   });
+// });
 
 const serialport = new SerialPort({ path: "/dev/ttyUSB0", baudRate: 57600 });
-const GET_RANDOM_CODE = [0xef, 0x01, 0xff, 0xff, 0xff, 0xff, ];
-serialport.write({ data: GET_RANDOM_CODE, encoding: "hex" });
+const writeResult = serialport.write(
+  Buffer.from(Commands.GET_RANDOM_CODE),
+  "hex"
+);
+serialport.drain();
+
+console.log(writeResult);
