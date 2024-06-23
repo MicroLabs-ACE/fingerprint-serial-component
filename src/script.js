@@ -9,9 +9,9 @@ document.getElementById("connect").addEventListener("click", async () => {
   try {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 57600, bufferSize: BUFFER_SIZE });
-    document.getElementById("status").textContent = "Connected to serial port!";
+    console.log("Connected to serial port.");
   } catch (error) {
-    document.getElementById("status").textContent = `Error: ${error}`;
+    console.error(`Error: ${error}`);
   }
 });
 
