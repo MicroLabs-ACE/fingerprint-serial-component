@@ -15,19 +15,13 @@ document.getElementById("connect").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("writeGRC").addEventListener("click", async () => {
-  await writeToSerial(Commands.GET_RANDOM_CODE);
-});
+// document.getElementById("writeGRC").addEventListener("click", async () => {
+//   await writeToSerial(Commands.GET_RANDOM_CODE);
+// });
 
-document.getElementById("readGRC").addEventListener("click", async () => {
-  await readFromSerial();
-});
-
-document
-  .getElementById("generateRandomCode")
-  .addEventListener("click", async () => {
-    await generateRandomCode();
-  });
+// document.getElementById("readGRC").addEventListener("click", async () => {
+//   await readFromSerial();
+// });
 
 document
   .getElementById("captureFingerprint")
@@ -87,10 +81,10 @@ async function readFromSerial() {
   return new Uint8Array(buffer);
 }
 
-async function generateRandomCode() {
-  await writeToSerial(Commands.GET_RANDOM_CODE);
-  await readFromSerial();
-}
+// async function generateRandomCode() {
+//   await writeToSerial(Commands.GET_RANDOM_CODE);
+//   await readFromSerial();
+// }
 
 async function captureFingerprint() {
   await writeToSerial(Commands.GEN_IMG);

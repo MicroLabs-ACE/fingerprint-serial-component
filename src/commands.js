@@ -25,13 +25,13 @@ export const Commands = {
     0x01, // Instruction Code
   ],
 
-  GET_RANDOM_CODE: [
-    ...HEADER_AND_ADDR,
-    0x01, // Package Identifier
-    0x00, // Package Length
-    0x03, // Package Length
-    0x14, // Instruction Code
-  ],
+  // GET_RANDOM_CODE: [
+  //   ...HEADER_AND_ADDR,
+  //   0x01, // Package Identifier
+  //   0x00, // Package Length
+  //   0x03, // Package Length
+  //   0x14, // Instruction Code
+  // ],
 
   SEARCH: [
     ...HEADER_AND_ADDR,
