@@ -66,10 +66,10 @@ async function writeToSerial(command) {
 }
 
 async function readFromSerial() {
-  async function readIntoBuffer(buffer) {
+  async function readIntoBuffer(reader, buffer) {
     let offset = 0;
     while (offset < buffer.byteLength) {
-      const { value, done } = await reader(new Uint8Array(buffer, offset));
+      const { value, done } = await reader.read(new Uint8Array(buffer, offset));
       if (done) break;
       buffer = value.buffer;
       offset += value.byteLength;
@@ -78,10 +78,23 @@ async function readFromSerial() {
     return buffer;
   }
 
+  const reader = port.readable.getReader({ mode: "byob" });
   let buffer = new ArrayBuffer(BUFFER_SIZE);
-  buffer = await readIntoBuffer(buffer);
+  buffer = await readIntoBuffer(reader, buffer);
   console.log(buffer);
 }
+
+// async function readFromSerial() {
+//   const reader = port.readable.getReader();
+//   try {
+//     const { value, done } = await reader.read();
+//     console.log("Got here.");
+//     console.log(`Received: ${value}`);
+//     reader.releaseLock();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
 // async function generateRandomCode() {
 //   await writeToSerial(Commands.GET_RANDOM_CODE);
