@@ -24,18 +24,6 @@ document.getElementById("connect").addEventListener("click", async () => {
 // });
 
 document
-  .getElementById("captureFingerprint")
-  .addEventListener("click", async () => {
-    await captureFingerprint();
-  });
-
-document
-  .getElementById("generateCharacterFile")
-  .addEventListener("click", async () => {
-    await generateCharacterFile();
-  });
-
-document
   .getElementById("verifyFingerprint")
   .addEventListener("click", async () => {
     await verifyFingerprint();
