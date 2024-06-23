@@ -23,29 +23,29 @@ document.getElementById("readGRC").addEventListener("click", async () => {
   await readFromSerial();
 });
 
-// document
-//   .getElementById("generateRandomCode")
-//   .addEventListener("click", async () => {
-//     await generateRandomCode();
-//   });
+document
+  .getElementById("generateRandomCode")
+  .addEventListener("click", async () => {
+    await generateRandomCode();
+  });
 
-// document
-//   .getElementById("captureFingerprint")
-//   .addEventListener("click", async () => {
-//     await captureFingerprint();
-//   });
+document
+  .getElementById("captureFingerprint")
+  .addEventListener("click", async () => {
+    await captureFingerprint();
+  });
 
-// document
-//   .getElementById("generateCharacterFile")
-//   .addEventListener("click", async () => {
-//     await generateCharacterFile();
-//   });
+document
+  .getElementById("generateCharacterFile")
+  .addEventListener("click", async () => {
+    await generateCharacterFile();
+  });
 
-// document
-//   .getElementById("verifyFingerprint")
-//   .addEventListener("click", async () => {
-//     await verifyFingerprint();
-//   });
+document
+  .getElementById("verifyFingerprint")
+  .addEventListener("click", async () => {
+    await verifyFingerprint();
+  });
 
 // Functions
 async function computeChecksum(byteArray) {
@@ -81,104 +81,95 @@ async function readFromSerial() {
   const reader = port.readable.getReader({ mode: "byob" });
   let buffer = new ArrayBuffer(BUFFER_SIZE);
   buffer = await readIntoBuffer(reader, buffer);
+  reader.releaseLock();
   console.log(buffer);
+
+  return new Uint8Array(buffer);
 }
 
-// async function readFromSerial() {
-//   const reader = port.readable.getReader();
-//   try {
-//     const { value, done } = await reader.read();
-//     console.log("Got here.");
-//     console.log(`Received: ${value}`);
-//     reader.releaseLock();
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
+async function generateRandomCode() {
+  await writeToSerial(Commands.GET_RANDOM_CODE);
+  await readFromSerial();
+}
 
-// async function generateRandomCode() {
-//   await writeToSerial(Commands.GET_RANDOM_CODE);
-//   await readFromSerial();
-// }
+async function captureFingerprint() {
+  await writeToSerial(Commands.GEN_IMG);
+  const result = await readFromSerial();
 
-// async function captureFingerprint() {
-//   await writeToSerial(Commands.GEN_IMG);
-//   await readFromSerial();
+  const confirmationCode = result[9];
+  switch (confirmationCode) {
+    case 0: // fingerprint collection success
+      console.log("Captured fingerprint.");
+      return true;
+    case 1: // error receiving package
+      console.error("Error when receiving package.");
+      return false;
+    case 2: // can't detect finger
+      console.log("No fingerprint detected.");
+      return false;
+    case 3: // failed to collect finger
+      console.error("Error when capturing fingerprint.");
+      return false;
+    default:
+      console.error("Unknown error.");
+      return false;
+  }
+}
 
-//   const confirmationCode = result.slice(9, 10);
-//   switch (confirmationCode) {
-//     case 0: // fingerprint collection success
-//       console.log("Captured fingerprint.");
-//       return true;
-//     case 1: // error receiving package
-//       console.log("Error when receiving package.");
-//       return false;
-//     case 2: // can't detect finger
-//       console.log("No fingerprint detected.");
-//       return false;
-//     case 3: // failed to collect finger
-//       console.log("Error when capturing fingerprint.");
-//       return false;
-//     default:
-//       console.log("Unknown error.");
-//       return false;
-//   }
-// }
+async function generateCharacterFile() {
+  await writeToSerial(Commands.GEN_CHAR);
+  const result = await readFromSerial();
 
-// async function generateCharacterFile() {
-//   await writeToSerial(Commands.GEN_CHAR);
-//   await readFromSerial();
+  const confirmationCode = result[9];
+  switch (confirmationCode) {
+    case 0: // generate character file success
+      console.log("Generated character file.");
+      return true;
+    case 1: // error receiving package
+    case 6: // failed to generate character file due to disorderly fingerprint image
+    case 7: // failed to generate character file due to lack of character in fingerprint image
+    case 21: // failed to generate character file due to invalid primary image
+    default:
+      console.error("Error when generating character file.");
+      return false;
+  }
+}
 
-//   const confirmationCode = result.slice(9, 10);
-//   switch (confirmationCode) {
-//     case 0: // generate character file success
-//       console.log("Generated character file.");
-//       return true;
-//     case 1: // error receiving package
-//     case 6: // failed to generate character file due to disorderly fingerprint image
-//     case 7: // failed to generate character file due to lack of character in fingerprint image
-//     case 21: // failed to generate character file due to invalid primary image
-//     default:
-//       console.log("Error when generating character file.");
-//       return false;
-//   }
-// }
+async function searchFingerprint() {
+  await writeToSerial(Commands.SEARCH);
+  const result = await readFromSerial();
 
-// async function searchFingerprint() {
-//   await writeToSerial(Commands.SEARCH);
-//   await readFromSerial();
+  const confirmationCode = result[9];
+  switch (confirmationCode) {
+    case 0: // found matching fingerprint
+      const pageIDArray = result.slice(10, 12);
+      const pageID = pageIDArray[0] * 256 + pageIDArray[1];
+      return pageID;
+    case 9: // no fingerprint matched
+      return -1;
+    case 1: // error receiving package
+    default:
+      return -2;
+  }
+}
 
-//   const confirmationCode = result.slice(9, 10);
-//   switch (confirmationCode) {
-//     case 0: // found matching fingerprint
-//       const pageIDArray = result.slice(10, 12);
-//       const pageID = pageIDArray[0] * 256 + pageIDArray[1];
-//       return pageID;
-//     case 9: // no fingerprint matched
-//       return -1;
-//     case 1: // error receiving package
-//     default:
-//       return -2;
-//   }
-// }
-
-// async function verifyFingerprint() {
-//   const isCaptureFingerprint = await captureFingerprint();
-//   if (isCaptureFingerprint) {
-//     const isGenerateCharacterFile = await generateCharacterFile();
-//     if (isGenerateCharacterFile) {
-//       const searchFingerprintResult = await searchFingerprint();
-//       switch (searchFingerprint) {
-//         case -2:
-//           console.log("Error receiving package.");
-//           break;
-//         case -1:
-//           console.log("Fingerprint not matched.");
-//           break;
-//         default:
-//           console.log(`ID: ${searchFingerprintResult}`);
-//           break;
-//       }
-//     }
-//   }
-// }
+async function verifyFingerprint() {
+  const isCaptureFingerprint = await captureFingerprint();
+  if (isCaptureFingerprint) {
+    const isGenerateCharacterFile = await generateCharacterFile();
+    if (isGenerateCharacterFile) {
+      const searchFingerprintResult = await searchFingerprint();
+      switch (searchFingerprint) {
+        case -2:
+          console.error("Error receiving package.");
+          break;
+        case -1:
+          console.log("Fingerprint not matched.");
+          break;
+        default:
+          console.log(`ID: ${searchFingerprintResult}`);
+          break;
+      }
+    }
+  }
+}
