@@ -157,3 +157,18 @@ async function verifyFingerprint() {
     }
   }
 }
+
+async function emptyFingerprintLibrary() {
+  await writeToSerial(Commands.EMPTY);
+  const result = readFromSerial();
+
+  const confirmationCode = result[9];
+  switch (confirmationCode) {
+    case 0: // emptied fingerprint database
+      return true;
+    case 1: // error receiving package
+    case 17: // failed to clear fingerprint library
+    default:
+      return false;
+  }
+}

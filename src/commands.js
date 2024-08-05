@@ -45,4 +45,13 @@ export const Commands = {
     0x01, // Page Number
     0x2b, // Page Number
   ],
+
+  EMPTY: [
+    ...HEADER_AND_ADDR,
+    0x01,
+    0x01, // Package Identifier
+    0x00, // Package Length
+    0x03, // Package Length
+    0x0d, // Instruction Code
+  ],
 };
