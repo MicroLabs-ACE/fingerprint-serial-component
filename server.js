@@ -1,7 +1,11 @@
 var liveServer = require("live-server");
+
 var params = {
-  file: "usb.html",
+  port: 8181,
+  host: "0.0.0.0",
+  root: ".",
+  open: false,
+  file: "./index.html",
   wait: 500,
 };
-
 liveServer.start(params);
