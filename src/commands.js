@@ -61,16 +61,17 @@ export const Commands = {
       0x00, // Package Length
       0x06, // Package Length
       0x07, // Instruction Code
-      0x01, // Buffer ID
+      0x02, // Buffer ID
       ...pageIdArray,
     ];
   },
 
-  UP_IMAGE: [
+  UP_CHAR: [
     ...HEADER_AND_ADDR,
     0x01, // Package Identifier
     0x00, // Package Length
-    0x03, // Package Length
-    0x0a, // Instruction Code
+    0x04, // Package Length
+    0x08, // Instruction Code
+    0x02, // Buffer ID
   ],
 };

@@ -1,6 +1,7 @@
 import { Commands } from "./commands.js";
 
 const bufferSize = 16;
+const fingerprintDataLength = 27;
 let port;
 
 // Event Listeners
@@ -141,9 +142,9 @@ async function verifyFingerprint() {
 }
 
 async function readFingerprintTemplate(pageIdArray) {
+  console.log("Command Page ID Array:", Commands.LOAD_CHAR(pageIdArray));
   await writeToSerial(Commands.LOAD_CHAR(pageIdArray));
   const result = await readFromSerial();
-  // DEBUG
   console.log(result);
 
   const confirmationCode = result[9];
@@ -157,18 +158,19 @@ async function readFingerprintTemplate(pageIdArray) {
 }
 
 async function uploadCharacterFile() {
-  await writeToSerial(Commands.UP_IMAGE);
+  await writeToSerial(Commands.UP_CHAR);
   const result = await readFromSerial();
+  console.log("UpChar Acknowledgement:", result);
 
   const confirmationCode = result[9];
   if (confirmationCode === 0) {
     let fingerprintData = [];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < fingerprintDataLength; i++) {
       const data = await readFromSerial();
       fingerprintData.push(...data);
     }
 
-    console.log(`Transferred fingerprint data: ${fingerprintData.length}`);
+    console.log(`Transferred fingerprint data: ${fingerprintData}`);
     return fingerprintData;
   } else {
     console.error(`Error uploading fingerprint file: ${confirmationCode}`);
@@ -189,17 +191,17 @@ async function uploadToComputer() {
   }
 }
 
-async function emptyFingerprintLibrary() {
-  await writeToSerial(Commands.EMPTY);
-  const result = await readFromSerial();
+// async function emptyFingerprintLibrary() {
+//   await writeToSerial(Commands.EMPTY);
+//   const result = await readFromSerial();
 
-  const confirmationCode = result[9];
-  switch (confirmationCode) {
-    case 0:
-      console.log("Emptied fingerprint library.");
-      return true;
-    default:
-      console.error("Error in emptying fingerprint library.");
-      return false;
-  }
-}
+//   const confirmationCode = result[9];
+//   switch (confirmationCode) {
+//     case 0:
+//       console.log("Emptied fingerprint library.");
+//       return true;
+//     default:
+//       console.error("Error in emptying fingerprint library.");
+//       return false;
+//   }
+// }
